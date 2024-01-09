@@ -1,0 +1,225 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="createAirlinesTable" author="sanin">
+        <createTable tableName="airlines">
+            <column name="airline_id" type="SMALLINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="airline_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="createAirportTable" author="sanin">
+        <createTable tableName="airport">
+            <column name="airport_id" type="SMALLINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="airport_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    
+    <changeSet id="createPassengersTablee" author="sanin">
+        <createTable tableName="passengers">
+            <column name="passengers_id" type="SMALLINT">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="first_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_number" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+    </changeSet>
+
+    <changeSet id="createFlightsTable" author="sanin">
+        <createTable tableName="flights">
+            <column name="flight_id" type="SMALLINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="departure_airport_id" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="arrival_airport_id" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="departure_time" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="arrival_time" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="airline_id" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="flights" baseColumnNames="airline_id" constraintName="fk_flight_airline" referencedTableName="airlines"
+                                 referencedColumnNames="airline_id"/>
+
+        <addForeignKeyConstraint baseTableName="flights" baseColumnNames="arrival_airport_id" constraintName="fk_flight_arrival_airport" referencedTableName="airport"
+                                 referencedColumnNames="airport_id"/>
+
+        <addForeignKeyConstraint baseTableName="flights" baseColumnNames="departure_airport_id" constraintName="fk_flight_departure_airport" referencedTableName="airport"
+                                 referencedColumnNames="airport_id"/>
+
+
+    </changeSet>
+
+    <changeSet id="createTicketsTable" author="sanin">
+        <createTable tableName="tickets">
+            <column name="ticket_id" type="SMALLINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="passengers_id" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="flight_id" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="seat_number" type="VARCHAR(20)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="ticket_price" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="purchase_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="tickets" baseColumnNames="passengers_id"
+                                 referencedTableName="passengers" referencedColumnNames="passengers_id"
+                                 constraintName="fk_ticket_passenger"/>
+
+        <addForeignKeyConstraint baseTableName="tickets" baseColumnNames="flight_id"
+                                 referencedTableName="flights" referencedColumnNames="flight_id"
+                                 constraintName="fk_ticket_flight"/>
+
+    </changeSet>
+
+    <changeSet id="createReservationsTable" author="sanin">
+        <createTable tableName="reservations">
+            <column name="reservation_id" type="SMALLINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ticket_id" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reservation_date_from" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reservation_date_to" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="reservations" baseColumnNames="ticket_id" constraintName="fk_reservations_ticket" referencedTableName="tickets"
+                                 referencedColumnNames="ticket_id"/>
+    </changeSet>
+
+    <changeSet id="createPaymentsTable" author="sanin">
+        <createTable tableName="payments">
+            <column name="payment_id" type="SMALLINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ticket_id" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_amount" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_method" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="payments" baseColumnNames="ticket_id" constraintName="fk_payment_ticket" referencedTableName="tickets"
+                                 referencedColumnNames="ticket_id"/>
+    </changeSet>
+
+    <changeSet id="CreateAirlineSequence" author="sanin">
+        <createSequence sequenceName="airline_sequence"
+        incrementBy="1"
+        maxValue="1000"
+        minValue="1"
+        startValue="1"
+        />
+    </changeSet>
+
+    <changeSet id="CreatePassengersSequence" author="sanin">
+        <createSequence sequenceName="passenger_sequence"
+                        incrementBy="1"
+                        maxValue="1000"
+                        minValue="1"
+                        startValue="1"
+                        />
+    </changeSet>
+
+    <changeSet id="CreateAirportSequence" author="sanin">
+        <createSequence sequenceName="airport_sequence"
+                        incrementBy="1"
+                        maxValue="1000"
+                        minValue="1"
+                        startValue="1"
+                        />
+    </changeSet>
+
+    <changeSet id="CreateFlightsSequence" author="sanin">
+        <createSequence sequenceName="flights_sequence"
+                        incrementBy="1"
+                        maxValue="1000"
+                        minValue="1"
+                        startValue="1"
+                        />
+    </changeSet>
+
+    <changeSet id="CreateTicketsSequence" author="sanin">
+        <createSequence sequenceName="tickets_sequence"
+                        incrementBy="1"
+                        maxValue="1000"
+                        minValue="1"
+                        startValue="1"
+                        />
+    </changeSet>
+
+    <changeSet id="CreatePaymentsSequence" author="sanin">
+        <createSequence sequenceName="payments_sequence"
+                        incrementBy="1"
+                        maxValue="1000"
+                        minValue="1"
+                        startValue="1"
+                        />
+    </changeSet>
+
+    <changeSet id="CreateReservationsSequence" author="sanin">
+        <createSequence sequenceName="reservations_sequence"
+                        incrementBy="1"
+                        maxValue="1000"
+                        minValue="1"
+                        startValue="1"
+                        />
+    </changeSet>
+
+
+
+</databaseChangeLog>
